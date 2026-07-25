@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tangkap Bintang</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; min-height: 100vh; font-family: system-ui, sans-serif;
+    background: radial-gradient(circle at 50% 0%, #312e81, #0f172a 60%);
+    color: #fff; display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .kotak { width: 100%; max-width: 420px; }
+  h1 { text-align: center; font-size: 26px; margin: 0 0 4px; }
+  p.sub { text-align: center; color: #a5b4fc; margin: 0 0 16px; font-size: 14px; }
+  .papan-skor { display: flex; gap: 10px; margin-bottom: 12px; }
+  .skor {
+    flex: 1; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 14px; padding: 10px; text-align: center;
+  }
+  .skor span { display: block; font-size: 11px; color: #c7d2fe; letter-spacing: 1px; }
+  .skor b { font-size: 22px; }
+  #arena {
+    position: relative; height: 320px; border-radius: 18px; overflow: hidden;
+    background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.15);
+    touch-action: manipulation;
+  }
+  #bintang {
+    position: absolute; font-size: 40px; line-height: 1; cursor: pointer;
+    transition: transform .08s; user-select: none;
+  }
+  #bintang:active { transform: scale(.8); }
+  #pesan {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    background: rgba(15,23,42,.85); text-align: center; padding: 16px;
+  }
+  button {
+    background: linear-gradient(90deg,#6366f1,#a855f7); color: #fff; border: 0;
+    padding: 12px 26px; border-radius: 999px; font-size: 16px; font-weight: 700;
+  }
+  button:active { opacity: .8; }
+  .sembunyi { display: none; }
+</style>
+</head>
+<body>
+  <div class="kotak">
+    <h1>⭐ Tangkap Bintang</h1>
+    <p class="sub">Ketuk bintang sebanyak mungkin dalam 30 detik!</p>
+
+    <div class="papan-skor">
+      <div class="skor"><span>SKOR</span><b id="skor">0</b></div>
+      <div class="skor"><span>WAKTU</span><b id="waktu">30</b></div>
+      <div class="skor"><span>REKOR</span><b id="rekor">0</b></div>
+    </div>
+
+    <div id="arena">
+      <div id="bintang" class="sembunyi">⭐</div>
+      <div id="pesan">
+        <div id="teks">Siap bermain?</div>
+        <button id="tombol">MULAI</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var skor = 0, waktu = 30, timer = null;
+  var elSkor = document.getElementById("skor");
+  var elWaktu = document.getElementById("waktu");
+  var elRekor = document.getElementById("rekor");
+  var arena = document.getElementById("arena");
+  var bintang = document.getElementById("bintang");
+  var pesan = document.getElementById("pesan");
+  var teks = document.getElementById("teks");
+  var tombol = document.getElementById("tombol");
+
+  var rekor = Number(localStorage.getItem("rekorBintang") || 0);
+  elRekor.textContent = rekor;
+
+  function pindahBintang() {
+    var x = Math.random() * (arena.clientWidth - 50);
+    var y = Math.random() * (arena.clientHeight - 50);
+    bintang.style.left = x + "px";
+    bintang.style.top = y + "px";
+  }
+
+  function mulai() {
+    skor = 0; waktu = 30;
+    elSkor.textContent = skor;
+    elWaktu.textContent = waktu;
+    pesan.classList.add("sembunyi");
+    bintang.classList.remove("sembunyi");
+    pindahBintang();
+    timer = setInterval(function () {
+      waktu--;
+      elWaktu.textContent = waktu;
+      if (waktu <= 0) selesai();
+    }, 1000);
+  }
+
+  function selesai() {
+    clearInterval(timer);
+    bintang.classList.add("sembunyi");
+    if (skor > rekor) {
+      rekor = skor;
+      localStorage.setItem("rekorBintang", rekor);
+      elRekor.textContent = rekor;
+    }
+    teks.innerHTML = "Waktu habis!<br>Skor kamu: <b>" + skor + "</b>";
+    tombol.textContent = "MAIN LAGI";
+    pesan.classList.remove("sembunyi");
+  }
+
+  bintang.addEventListener("click", function () {
+    skor++;
+    elSkor.textContent = skor;
+    pindahBintang();
+  });
+
+  tombol.addEventListener("click", mulai);
+</script>
+</body>
+</html>
+
